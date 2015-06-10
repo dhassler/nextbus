@@ -16,7 +16,7 @@
     {:lang "en"}
     [:head (hiccup.page/include-css "style.css")]
     [:body [:div [:h1 {:class "info"} "Leaving Lafayette"]
-            [:table (map bus-row (take 4 (get-buses-test "14th")))]
+            [:table (map bus-row (take 4 (get-buses "14th")))]
             [:button {:class "reload" :type "button" :onClick "location.reload(true)"} "Reload"]
             ]]))
 

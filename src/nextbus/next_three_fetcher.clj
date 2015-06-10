@@ -7,7 +7,7 @@
 (defn fetch-url [url]
   (html/html-resource (java.net.URL. url)))
 
-(def test-html-data
+(defn test-html-data []
   (html/html-resource "get-my-stop.html"))
 
 ; Extract route - second element in tr list
@@ -61,4 +61,4 @@
 (defn get-buses-test [dest-filter-string]
   (sort-by :time
     (filter #(.contains (:destination %) dest-filter-string)
-            (mapcat process-row (get-rows test-html-data)))))
+            (mapcat process-row (get-rows (test-html-data))))))
