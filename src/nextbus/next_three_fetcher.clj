@@ -1,5 +1,6 @@
 (ns nextbus.next-three-fetcher
-  (:require [net.cgrand.enlive-html :as html]))
+  (:require [net.cgrand.enlive-html :as html]
+            [clojure.string :as s]))
 
 (def rtd-url "http://m.rtd-denver.com/mobi/getMyStop.do?stopId=&lightRailStation=&pnr=24")
 
@@ -24,13 +25,13 @@
 ;   :attrs {:bgcolor "#f4f4f4"},
 ;   :content ("14th/Walnut (Sb)")}
 (defn extract-first-content [td]
-    (clojure.string/replace (first (:content td)) #"[\n\t\r]" ""))
+    (s/replace (first (:content td)) #"[\n\t\r]" ""))
 
 (defn format-time [s]
-  (let [z (clojure.string/replace s #"^\d:" #(str "0" %1))]
+  (let [z (s/replace s #"^\d:" #(str "0" %1))]
     (if (.endsWith z "a")
-      (clojure.string/replace z "a" "")
-      (clojure.string/replace (clojure.string/replace z #"^\d+" #(str (+ 12 (Integer/parseInt %1)))) "p" ""))))
+      (s/replace z "a" "")
+      (s/replace (s/replace z #"^\d+" #(str (+ 12 (Integer/parseInt %1)))) "p" ""))))
 
 (defn process-row [row]
   [
