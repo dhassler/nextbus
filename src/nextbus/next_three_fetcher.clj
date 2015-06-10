@@ -55,8 +55,9 @@
 
 (defn get-buses [dest-filter-string]
   (sort-by :time
-    (filter #(.contains (:destination %) dest-filter-string)
-            (mapcat process-row (get-rows (fetch-url rtd-url))))))
+           (filter #(.contains (:time %) ":")
+                   (filter #(.contains (:destination %) dest-filter-string)
+                           (mapcat process-row (get-rows (fetch-url rtd-url)))))))
 
 (defn get-buses-test [dest-filter-string]
   (sort-by :time

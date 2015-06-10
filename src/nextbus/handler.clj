@@ -15,10 +15,12 @@
   (hiccup.page/html5
     {:lang "en"}
     [:head (hiccup.page/include-css "style.css")]
-    [:body [:div [:h1 {:class "info"} "Leaving Lafayette"]
-            [:table (map bus-row (take 4 (get-buses "14th")))]
-            [:button {:class "reload" :type "button" :onClick "location.reload(true)"} "Reload"]
-            ]]))
+    [:body [:div [:h1 {:class "info"} "From Lafayette PnR"]
+            [:h4 {:id "current-time"}]
+            [:table (map bus-row (take 5 (get-buses "14th")))]
+            [:button {:class "reload" :type "button" :onClick "location.reload(true)"} [:h2 "Reload"]]
+            ]
+     (hiccup.page/include-js "nextbus.js")]))
 
 
 (defroutes app-routes
