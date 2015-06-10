@@ -7,6 +7,9 @@
 (defn fetch-url [url]
   (html/html-resource (java.net.URL. url)))
 
+(def test-html-data
+  (html/html-resource "get-my-stop.html"))
+
 ; Extract route - second element in tr list
 ; {:tag :th,
 ; :attrs {:bgcolor "#f4f4f4", :scope "row", :class "leftcol"},
@@ -31,7 +34,7 @@
   (let [z (s/replace s #"^\d:" #(str "0" %1))]
     (if (.endsWith z "a")
       (s/replace z "a" "")
-      (s/replace (s/replace z #"^\d+" #(str (+ 12 (Integer/parseInt %1)))) "p" ""))))
+      (s/replace (s/replace (s/replace z #"^\d+" #(str (+ 12 (Integer/parseInt %1)))) "p" "") #"^24" "12"))))
 
 (defn process-row [row]
   [
@@ -54,3 +57,8 @@
   (sort-by :time
     (filter #(.contains (:destination %) dest-filter-string)
             (mapcat process-row (get-rows (fetch-url rtd-url))))))
+
+(defn get-buses-test [dest-filter-string]
+  (sort-by :time
+    (filter #(.contains (:destination %) dest-filter-string)
+            (mapcat process-row (get-rows test-html-data)))))

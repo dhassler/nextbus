@@ -4,9 +4,6 @@
             [net.cgrand.enlive-html :as html]
             [clojure.pprint]))
 
-(def test-html-data
-  (html/html-resource "get-my-stop.html"))
-
 (deftest test-parse
   (testing "get rows"
     (with-redefs [fetch-url (fn [_] test-html-data)]

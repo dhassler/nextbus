@@ -1,0 +1,18 @@
+body {
+  font-family: "Futura";
+  text-align: center;
+}
+
+table {
+  width: 90%;
+}
+
+table td {
+  padding: 10px;
+}
+
+button.reload {
+  width: 90%;
+  height: 5em;
+  margin: 20px;
+}
