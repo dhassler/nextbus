@@ -16,12 +16,11 @@
   (testing "process row"
     (with-redefs [fetch-url (fn [_] test-html-data)]
       (let [rows (get-rows (fetch-url ""))
-            row  (process-row (first rows))]
+            res  (process-row (first rows))
+            row  (first res)]
         (is (= "225D" (:route row)))
         (is (= "14th/Walnut (Sb)" (:destination row)))
-        (is (= "09:29a" (:first_time row)))
-        (is (= "10:29a" (:second_time row)))
-    )))
+        (is (= "09:29" (:time row))))))
 
   (testing "all rows"
     (with-redefs [fetch-url (fn [_] test-html-data)]

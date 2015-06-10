@@ -27,17 +27,22 @@
     (clojure.string/replace (first (:content td)) #"[\n\t\r]" ""))
 
 (defn format-time [s]
-  (clojure.string/replace
-    s
-    #"^\d:"
-    #(str "0" %1)))
+  (let [z (clojure.string/replace s #"^\d:" #(str "0" %1))]
+    (if (.endsWith z "a")
+      (clojure.string/replace z "a" "")
+      (clojure.string/replace (clojure.string/replace z #"^\d+" #(str (+ 12 (Integer/parseInt %1)))) "p" ""))))
 
 (defn process-row [row]
-  (-> {}
-      (assoc :route       (extract-route         (nth row 1)))
-      (assoc :destination (extract-first-content (nth row 3)))
-      (assoc :first_time  (format-time (extract-first-content (nth row 5))))
-      (assoc :second_time (format-time (extract-first-content (nth row 7))))))
+  [
+    (-> {}
+        (assoc :route       (extract-route         (nth row 1)))
+        (assoc :destination (extract-first-content (nth row 3)))
+        (assoc :time        (format-time (extract-first-content (nth row 5)))))
+    (-> {}
+        (assoc :route       (extract-route         (nth row 1)))
+        (assoc :destination (extract-first-content (nth row 3)))
+        (assoc :time        (format-time (extract-first-content (nth row 7)))))
+   ])
 
 (defn get-rows [html]
   (let [trs (html/select html [:table :tbody :tr])
@@ -45,6 +50,6 @@
     (filter #(> (count %) 4) cs)))
 
 (defn get-buses [dest-filter-string]
-  (sort-by :first_time
+  (sort-by :time
     (filter #(.contains (:destination %) dest-filter-string)
-            (map process-row (get-rows (fetch-url rtd-url))))))
+            (mapcat process-row (get-rows (fetch-url rtd-url))))))
