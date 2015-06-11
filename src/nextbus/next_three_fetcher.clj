@@ -1,8 +1,10 @@
 (ns nextbus.next-three-fetcher
   (:require [net.cgrand.enlive-html :as html]
-            [clojure.string :as s]))
+            [clojure.core.async :refer [>! <!! chan go]]
+            [clojure.string :as s]
+            [clojure.pprint :as pp]))
 
-(def rtd-url "http://m.rtd-denver.com/mobi/getMyStop.do?stopId=&lightRailStation=&pnr=24")
+(def rtd-url "http://m.rtd-denver.com/mobi/getMyStop.do?stopId=")
 
 (defn fetch-url [url]
   (html/html-resource (java.net.URL. url)))
@@ -53,13 +55,22 @@
         cs  (map :content trs)]
     (filter #(> (count %) 4) cs)))
 
-(defn get-buses [dest-filter-string]
+(defn parallel-fetch [ids]
+  (let [http-channel (chan)
+        res          (atom [])]
+    (doseq [id ids]
+      (go (>! http-channel (fetch-url (str rtd-url id)))))
+    (doseq [id ids]
+      (swap! res conj (<!! http-channel)))
+    (mapcat process-row (mapcat get-rows @res))))
+
+(defn get-buses [ids dest-filter-string]
   (sort-by :time
            (filter #(.contains (:time %) ":")
                    (filter #(.contains (:destination %) dest-filter-string)
-                           (mapcat process-row (get-rows (fetch-url rtd-url)))))))
+                           (parallel-fetch ids)))))
 
-(defn get-buses-test [dest-filter-string]
+(defn get-buses-test [ids dest-filter-string]
   (sort-by :time
     (filter #(.contains (:destination %) dest-filter-string)
             (mapcat process-row (get-rows (test-html-data))))))
