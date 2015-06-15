@@ -5,8 +5,8 @@
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
             (hiccup page core form)))
 
-(def origin-map { "b" {:label "Boulder", :ids [33236,24591,34281], :filter ""},
-                    "l" {:label "Lafayette", :ids [25903], :filter "14th"}})
+(def origin-map { "b" {:label "Boulder",   :ids [33236,24591,34281], :filter "(Broomfield|Lafayette)"},
+                  "l" {:label "Lafayette", :ids [25903],             :filter "14th"}})
 
 
 (defn bus-row [h]
@@ -14,8 +14,6 @@
                      [:td (:time h)]
                      [:td (:route h)]
                      [:td (:destination h)]]))
-
-; (if (re-matches #".*(y|r).*" "Boulder") "Yes" "No")
 
 (defn index [origin]
   (hiccup.page/html5
@@ -30,6 +28,7 @@
 
 (defroutes app-routes
   (GET "/" [] (index (origin-map "b")))
+  (GET "/:dest" {{dest :dest} :params} (index (origin-map dest)))
   (route/not-found "Not Found"))
 
 (def app

@@ -38,17 +38,13 @@
       (s/replace z "a" "")
       (s/replace (s/replace (s/replace z #"^\d+" #(str (+ 12 (Integer/parseInt %1)))) "p" "") #"^24" "12"))))
 
-(defn process-row [row]
-  [
-    (-> {}
-        (assoc :route       (extract-route         (nth row 1)))
-        (assoc :destination (extract-first-content (nth row 3)))
-        (assoc :time        (format-time (extract-first-content (nth row 5)))))
-    (-> {}
-        (assoc :route       (extract-route         (nth row 1)))
-        (assoc :destination (extract-first-content (nth row 3)))
-        (assoc :time        (format-time (extract-first-content (nth row 7)))))
-   ])
+(defn row-to-hash [row time-idx]
+  (-> {}
+      (assoc :route       (extract-route         (nth row 1)))
+      (assoc :destination (extract-first-content (nth row 3)))
+      (assoc :time        (format-time (extract-first-content (nth row time-idx))))))
+
+(defn process-row [row] [(row-to-hash row 5) (row-to-hash row 7)])
 
 (defn get-rows [html]
   (let [trs (html/select html [:table :tbody :tr])
@@ -58,17 +54,22 @@
 (defn parallel-fetch [ids]
   (let [http-channel (chan)
         res          (atom [])]
+
     (doseq [id ids]
       (go (>! http-channel (fetch-url (str rtd-url id)))))
+
     (doseq [id ids]
       (swap! res conj (<!! http-channel)))
+
     (mapcat process-row (mapcat get-rows @res))))
 
 (defn get-buses [ids dest-filter-string]
-  (sort-by :time
-           (filter #(.contains (:time %) ":")
-                   (filter #(.contains (:destination %) dest-filter-string)
-                           (parallel-fetch ids)))))
+  (let [regex (re-pattern (str ".*" dest-filter-string ".*"))]
+    (->>
+      (parallel-fetch ids)
+      (filter #(.contains (:time %) ":"))
+      (filter #(re-matches regex (:destination %)))
+      (sort-by :time))))
 
 (defn get-buses-test [ids dest-filter-string]
   (sort-by :time
