@@ -72,6 +72,9 @@
       (sort-by :time))))
 
 (defn get-buses-test [ids dest-filter-string]
-  (sort-by :time
-    (filter #(.contains (:destination %) dest-filter-string)
-            (mapcat process-row (get-rows (test-html-data))))))
+  (let [regex (re-pattern (str ".*" dest-filter-string ".*"))]
+    (->>
+      (mapcat process-row (mapcat get-rows [(test-html-data)]))
+      (filter #(.contains (:time %) ":"))
+      (filter #(re-matches regex (:destination %)))
+      (sort-by :time))))

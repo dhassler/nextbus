@@ -7,8 +7,18 @@ function timer(){
      t_str   = [(hours < 10 ? "0" + hours : hours),
                 (minutes < 10 ? "0" + minutes : minutes),
                 (seconds < 10 ? "0" + seconds : seconds)].join(":");
- document.getElementById('current-time').innerHTML = "Current time: " + t_str;
+ document.getElementById('current-time').innerHTML = t_str;
  setTimeout(timer,1000);
 }
 
 timer();
+
+function swap(){
+  var loc = window.location + "";
+  if (loc.endsWith("b")) {
+    window.location = loc.replace(/b$/, "l");
+  }
+  else {
+    window.location = loc.replace(/l*$/, "b");
+  }
+}

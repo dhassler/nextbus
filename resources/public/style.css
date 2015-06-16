@@ -1,20 +1,32 @@
-body {
-  font-family: "Futura";
-  font-size: 1.5em;
-  text-align: center;
-  font-color: #333;
+html { font-size: 120%; color: #333; }
+
+.wrapper { margin: 0 auto; max-width: 24rem; width: 95%; }
+
+*, *:before, *:after { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
+.row { *zoom: 1; }
+.row:before, .row:after { content: " "; display: table; }
+.row:after { clear: both; }
+
+.column.full { width: 100%; }
+.column.half { width: 50%; }
+.column { float: left; padding: 10px; text-align: center; }
+
+
+.column.title { font-size: 1.4rem; }
+.column.title button { margin-left: 10px; }
+
+.column.time { font-size: 1.2rem; }
+
+button {
+  display: inline-block;
+  appearance: none;
+  box-shadow: none;
+  border-radius: 0;
+  color: #333;
+  background: white;
+  border: none;
 }
 
-table {
-  width: 90%;
-}
+button.swap { padding: 0rem .5rem; }
 
-table td {
-  padding: 10px;
-}
-
-button.reload {
-  width: 90%;
-  height: 5em;
-  margin: 20px;
-}
+button.reload { width: 80%; padding: .5rem; }
