@@ -21,7 +21,7 @@
     [:head
        (hiccup.page/include-css "normalize.css")
        (hiccup.page/include-css "style.css")
-       [:meta {:viewport "width=device-width, initial-scale=1"}]]
+       [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]]
     [:body [:div {:class "wrapper"}
             [:div {:class "row"}
               [:div {:class "full column centered title"} (:label origin) [:button {:class "swap" :onclick "swap()"} "&#8634"]]]
