@@ -4,7 +4,7 @@ function timer(){
      ampm    = hours<12 ? ' AM' : ' PM',
      minutes = now.getMinutes(),
      seconds = now.getSeconds(),
-     t_str   = [(hours < 10 ? "0" + hours : hours),
+     t_str   = [hours,
                 (minutes < 10 ? "0" + minutes : minutes),
                 (seconds < 10 ? "0" + seconds : seconds)].join(":");
  document.getElementById('current-time').innerHTML = t_str;
@@ -15,7 +15,7 @@ timer();
 
 function swap(){
   var loc = window.location + "";
-  if (loc.endsWith("b")) {
+  if (/.*\/b$/.test(loc)) {
     window.location = loc.replace(/b$/, "l");
   }
   else {
