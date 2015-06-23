@@ -1,6 +1,7 @@
 (defproject nextbus "1.0.0"
   :description "Get next buses from Lafayette PnR"
-  :url "http://example.com/FIXME"
+  :url "http://github.com/dhassler/nextbus"
+  :license {"name" "MIT"}
   :min-lein-version "2.0.0"
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [compojure "1.3.1"]
