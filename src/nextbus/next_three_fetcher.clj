@@ -1,16 +1,12 @@
 (ns nextbus.next-three-fetcher
   (:require [net.cgrand.enlive-html :as html]
             [clojure.core.async :refer [>! <!! chan go]]
-            [clojure.string :as s]
-            [clojure.pprint :as pp]))
+            [clojure.string :as s]))
 
 (def rtd-url "http://m.rtd-denver.com/mobi/getMyStop.do?stopId=")
 
-(defn fetch-url [url]
-  (html/html-resource (java.net.URL. url)))
-
-(defn test-html-data []
-  (html/html-resource "get-my-stop.html"))
+(defn fetch-mystop [mystop-id]
+  (html/html-resource (java.net.URL. (str rtd-url mystop-id))))
 
 ; Extract route - second element in tr list
 ; {:tag :th,
@@ -56,7 +52,7 @@
         res          (atom [])]
 
     (doseq [id ids]
-      (go (>! http-channel (fetch-url (str rtd-url id)))))
+      (go (>! http-channel (fetch-mystop id))))
 
     (doseq [id ids]
       (swap! res conj (<!! http-channel)))
@@ -67,14 +63,6 @@
   (let [regex (re-pattern (str ".*" dest-filter-string ".*"))]
     (->>
       (parallel-fetch ids)
-      (filter #(.contains (:time %) ":"))
-      (filter #(re-matches regex (:destination %)))
-      (sort-by :time))))
-
-(defn get-buses-test [ids dest-filter-string]
-  (let [regex (re-pattern (str ".*" dest-filter-string ".*"))]
-    (->>
-      (mapcat process-row (mapcat get-rows [(test-html-data)]))
       (filter #(.contains (:time %) ":"))
       (filter #(re-matches regex (:destination %)))
       (sort-by :time))))

@@ -1,25 +1,19 @@
 (ns nextbus.next-three-fetcher-test
   (:require [clojure.test :refer :all]
-            [nextbus.next-three-fetcher :refer :all]
-            [net.cgrand.enlive-html :as html]
-            [clojure.pprint]))
+            [nextbus.next-three-fetcher :as f]
+            [nextbus.stub-fetcher :as s]))
+
+(use-fixtures :once s/stub-http-response)
 
 (deftest test-parse
   (testing "get rows"
-    (with-redefs [fetch-url (fn [_] (test-html-data))]
-      (let [rows (get-rows (fetch-url ""))]
-        (is (= (count rows) 11)))))
+      (let [rows (f/get-rows (f/fetch-mystop 25903))]
+        (is (= (count rows) 7))))
 
   (testing "process row"
-    (with-redefs [fetch-url (fn [_] (test-html-data))]
-      (let [rows (get-rows (fetch-url ""))
-            res  (process-row (first rows))
+      (let [rows (f/get-rows (f/fetch-mystop 25903))
+            res  (f/process-row (first rows))
             row  (first res)]
         (is (= "225D" (:route row)))
         (is (= "14th/Walnut (Sb)" (:destination row)))
-        (is (= "09:29" (:time row))))))
-
-  (testing "all rows"
-    (with-redefs [fetch-url (fn [_] (test-html-data))]
-      (clojure.pprint/pprint (get-buses "14th")))))
-
+        (is (= "14:27" (:time row))))))

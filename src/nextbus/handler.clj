@@ -1,7 +1,7 @@
 (ns nextbus.handler
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
-            [nextbus.next-three-fetcher :refer [get-buses get-buses-test]]
+            [nextbus.next-three-fetcher :refer [get-buses]]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
             [clojure.string :as s]
             (hiccup page core form)))
@@ -9,12 +9,10 @@
 (def origin-map { "b" {:label "Boulder",   :ids [33236,24591,34281], :filter "(Broomfield|Lafayette)"},
                   "l" {:label "Lafayette", :ids [25903,17962],       :filter "14th"}})
 
-
 (defn bus-row [h]
   (hiccup.core/html [:div {:class "row"}
                      [:div {:class "half column"} (s/replace (:time h) #"^0" "")]
                      [:div {:class "half column"} (:route h)]]))
-
 
 (defn index [origin]
   (hiccup.page/html5
@@ -53,7 +51,7 @@
 
 (defroutes app-routes
   (GET "/" [] (index (origin-map "l")))
-  (GET "/:dest" {{dest :dest} :params} (index (origin-map dest)))
+  (GET "/:dest" {{dest :dest} :params} (if (contains? origin-map dest) (index (origin-map dest)) (route/not-found "Not Found")))
   (route/not-found "Not Found"))
 
 (def app
