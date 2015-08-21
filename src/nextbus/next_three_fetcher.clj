@@ -29,7 +29,7 @@
     (s/replace (first (:content td)) #"[\n\t\r]" ""))
 
 (defn format-time [s]
-  (let [z (s/replace s #"^\d:" #(str "0" %1))]
+  (let [z (s/replace (s/trim s) #"^\d:" #(str "0" %1))]
     (if (.endsWith z "a")
       (s/replace z "a" "")
       (s/replace (s/replace (s/replace z #"^\d+" #(str (+ 12 (Integer/parseInt %1)))) "p" "") #"^24" "12"))))
