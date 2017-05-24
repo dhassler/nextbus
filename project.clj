@@ -1,4 +1,4 @@
-(defproject nextbus "1.0.0"
+(defproject nextbus "1.1.0"
   :description "Get next buses from Lafayette PnR"
   :url "http://github.com/dhassler/nextbus"
   :license {:name "MIT"
