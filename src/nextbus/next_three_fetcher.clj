@@ -1,68 +1,37 @@
 (ns nextbus.next-three-fetcher
-  (:require [net.cgrand.enlive-html :as html]
-            [clojure.core.async :refer [>! <!! chan go]]
-            [clojure.string :as s]))
+  (:require [clojure.data.json :as json]
+            [clj-time.core :as t]
+            [clj-time.format :as tf]
+            [clj-time.coerce :as tc]))
 
-(def rtd-url "http://m.rtd-denver.com/mobi/getMyStop.do?stopId=")
+(def rtd-json-url "https://www.rtd-denver.com/api/nextride/stops/")
 
-(defn fetch-mystop [mystop-id]
-  (html/html-resource (java.net.URL. (str rtd-url mystop-id))))
+(def my-format (tf/formatter "hh:mm"))
 
-; Extract route - second element in tr list
-; {:tag :th,
-; :attrs {:bgcolor "#f4f4f4", :scope "row", :class "leftcol"},
-; :content
-; ({:tag :a,
-;      :attrs
-;      {:href "getSchedulesFormForChosenRoute.do?routeId=225&type=bus"},
-;      :content ("225D")})}
-(defn extract-route [th]
-  (let [c (:content th)
-        f (first c)
-        c2 (:content f)]
-    (first c2)))
+(defn format-time [unixtime]
+  (let [d (->
+            unixtime
+            (* 1000)
+            (java.util.Date.)
+            (tc/from-date))
+        my-tz (t/time-zone-for-id "America/Denver")
+        new-d  (t/from-time-zone d my-tz)]
+    (tf/unparse my-format new-d)))
 
-; {:tag :td,
-;   :attrs {:bgcolor "#f4f4f4"},
-;   :content ("14th/Walnut (Sb)")}
-(defn extract-first-content [td]
-    (s/replace (first (:content td)) #"[\n\t\r]" ""))
+(defn fetch-json-data [id]
+  (slurp (str rtd-json-url id)))
 
-(defn format-time [s]
-  (let [z (s/replace (s/trim s) #"^\d:" #(str "0" %1))]
-    (if (.endsWith z "a")
-      (s/replace z "a" "")
-      (s/replace (s/replace (s/replace z #"^\d+" #(str (+ 12 (Integer/parseInt %1)))) "p" "") #"^24" "12"))))
+(defn process-json [json-string headsign-filters]
+  (let [parsed-json (json/read-str json-string :key-fn keyword)
+        child-stops (get-in parsed-json [:data :attributes :childStops])
+        route-patterns (flatten (map :routePatterns child-stops))
+        trip-stops (flatten (map :tripStops route-patterns))
+        buses (map #(select-keys % [:trip_headsign :scheduled_departure_time :route_short_name]) trip-stops)
+        filter-fn (partial contains? headsign-filters)
+        filtered-buses (filter #(filter-fn (:trip_headsign %)) buses)
+        buses-with-date (map #(assoc % :time (format-time (:scheduled_departure_time %))) filtered-buses)
+        final-buses (sort-by :scheduled_departure_time buses-with-date)]
+    final-buses))
 
-(defn row-to-hash [row time-idx]
-  (-> {}
-      (assoc :route       (extract-route         (nth row 1)))
-      (assoc :destination (extract-first-content (nth row 3)))
-      (assoc :time        (format-time (extract-first-content (nth row time-idx))))))
-
-(defn process-row [row] [(row-to-hash row 5) (row-to-hash row 7)])
-
-(defn get-rows [html]
-  (let [trs (html/select html [:table :tbody :tr])
-        cs  (map :content trs)]
-    (filter #(> (count %) 4) cs)))
-
-(defn parallel-fetch [ids]
-  (let [http-channel (chan)
-        res          (atom [])]
-
-    (doseq [id ids]
-      (go (>! http-channel (fetch-mystop id))))
-
-    (doseq [id ids]
-      (swap! res conj (<!! http-channel)))
-
-    (mapcat process-row (mapcat get-rows @res))))
-
-(defn get-buses [ids dest-filter-string]
-  (let [regex (re-pattern (str ".*" dest-filter-string ".*"))]
-    (->>
-      (parallel-fetch ids)
-      (filter #(.contains (:time %) ":"))
-      (filter #(re-matches regex (:destination %)))
-      (sort-by :time))))
+(defn get-buses-json [id dest-filters]
+ (process-json (fetch-json-data id) dest-filters))

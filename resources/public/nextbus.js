@@ -1,7 +1,6 @@
 function timer(){
  var now     = new Date,
-     hours   = now.getHours(),
-     ampm    = hours<12 ? ' AM' : ' PM',
+     hours   = now.getHours()<12 ? now.getHours() : now.getHours()-12,
      minutes = now.getMinutes(),
      seconds = now.getSeconds(),
      t_str   = [hours,
