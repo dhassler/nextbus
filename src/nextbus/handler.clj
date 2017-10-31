@@ -1,4 +1,5 @@
 (ns nextbus.handler
+  (:gen-class)
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
             [nextbus.next-three-fetcher :refer [get-buses-json]]
@@ -6,8 +7,8 @@
             [clojure.string :as s]
             (hiccup page core form)))
 
-(def origin-map { "b" {:label "Boulder",   :id 33700, :filter #{"US36 & Brmfld 225D Diamond Cir 225 Laf PnR" "US36 & Broomfield" "Lafayette PnR" "US36 & Brmfld 225E EBCC 225E Laf PnR" "Lafayette PnR via Sir Galahad"}},
-                  "l" {:label "Lafayette", :id 33818, :filter #{"Dtwn Boulder" "Dtwn Bldr 225E via EBCC" "Dwtn Boulder" "Dtwn Bldr 225D Dmd Circle"}}})
+(def origin-map { "b" {:label "Boulder",   :id 33700, :filter #{"US36 & Brmfld 225D Diamond Cir 225 Laf PnR" "Lafayette PnR" "US36 & Brmfld 225E EBCC 225E Laf PnR" "Lafayette PnR via Sir Galahad" "US36 & Brmfld  225D Diamond Cir  225 Laf PnR" "US36 & Broomfield"}},
+                  "l" {:label "Lafayette", :id 33818, :filter #{"Dtwn Boulder" "Dtwn Bldr  225D Dmd Circle" "Dtwn Bldr  225E via EBCC" ""}}})
 
 (defn bus-row [h]
   (hiccup.core/html [:div {:class "row"}
@@ -56,3 +57,6 @@
 
 (def app
   (wrap-defaults app-routes site-defaults))
+
+(defn -main [& args]
+  (app))
