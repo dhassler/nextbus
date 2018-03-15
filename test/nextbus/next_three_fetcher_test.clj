@@ -20,3 +20,9 @@
     (is (= 1 1))
     )))
 
+
+(deftest test-parse-time
+  (testing "date is correct tz"
+    (let [unixtime 1510186144
+          parsed-time (f/format-time unixtime)]
+      (is (= parsed-time "foo")))))

@@ -9,7 +9,7 @@
                  [ring/ring-defaults "0.1.2"]
                  [org.clojure/data.json "0.2.6"]
                  [hiccup "1.0.5"]
-                 [clj-time "0.13.0"]]
+                 [clj-time "0.14.0"]]
   :plugins [[lein-ring "0.12.0"]]
   :ring {:handler nextbus.handler/app}
   :profiles
