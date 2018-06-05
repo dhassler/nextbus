@@ -32,6 +32,7 @@
         filtered-buses (filter #(filter-fn (:trip_headsign %)) buses)
         buses-with-date (map #(assoc % :time (format-time (:scheduled_departure_time %))) filtered-buses)
         final-buses (sort-by :scheduled_departure_time buses-with-date)]
+    ;(clojure.pprint/pprint buses)
     final-buses))
 
 (defn get-buses-json [id dest-filters]
