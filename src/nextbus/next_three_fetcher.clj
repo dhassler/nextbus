@@ -14,8 +14,8 @@
             (* 1000)
             (java.util.Date.)
             (tc/from-date))
-        my-tz (t/time-zone-for-id "America/Denver")
-        ; my-tz (t/time-zone-for-id "US/Eastern")
+        ; my-tz (t/time-zone-for-id "America/Denver")
+        my-tz (t/time-zone-for-id "US/Eastern")
         new-d  (t/from-time-zone d my-tz)]
     (tf/unparse my-format new-d)))
 
