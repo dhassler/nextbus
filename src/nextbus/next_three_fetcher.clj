@@ -1,23 +1,16 @@
 (ns nextbus.next-three-fetcher
   (:require [clojure.data.json :as json]
-            [clj-time.core :as t]
-            [clj-time.format :as tf]
-            [clj-time.coerce :as tc]))
+            [java-time :as jt]))
 
 (def rtd-json-url "https://www.rtd-denver.com/api/nextride/stops/")
-
-(def my-format (tf/formatter "hh:mm"))
 
 (defn format-time [unixtime]
   (let [d (->
             unixtime
             (* 1000)
-            (java.util.Date.)
-            (tc/from-date))
-        ; my-tz (t/time-zone-for-id "America/Denver")
-        my-tz (t/time-zone-for-id "US/Eastern")
-        new-d  (t/from-time-zone d my-tz)]
-    (tf/unparse my-format new-d)))
+            (jt/instant)
+            (jt/local-date-time "America/Denver"))]
+    (jt/format "hh:mm" d)))
 
 (defn fetch-json-data [id]
   (slurp (str rtd-json-url id)))
@@ -32,7 +25,6 @@
         filtered-buses (filter #(filter-fn (:trip_headsign %)) buses)
         buses-with-date (map #(assoc % :time (format-time (:scheduled_departure_time %))) filtered-buses)
         final-buses (sort-by :scheduled_departure_time buses-with-date)]
-    ;(clojure.pprint/pprint buses)
     final-buses))
 
 (defn get-buses-json [id dest-filters]

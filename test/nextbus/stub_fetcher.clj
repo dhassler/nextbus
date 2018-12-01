@@ -1,5 +1,4 @@
-(ns nextbus.stub-fetcher
-  )
+(ns nextbus.stub-fetcher)
 
 (defn load-stub-file [mystop-id]
   (slurp (str "test/html/" mystop-id ".json")))
