@@ -1,5 +1,6 @@
 (ns nextbus.next-three-fetcher
   (:require [clojure.data.json :as json]
+            [clojure.core.async :refer [>! <!! chan go]]
             [java-time :as jt]))
 
 (def rtd-json-url "https://www.rtd-denver.com/api/nextride/stops/")
@@ -29,7 +30,13 @@
  (process-json (fetch-json-data id) dest-filters))
 
 (defn get-buses-json-multi [ids dest-filters]
-  (sort-by :scheduled_departure_time
-           (mapcat
-             #(process-json (fetch-json-data %) dest-filters)
-             ids)))
+  (let [fetch-channel (chan)
+        result (atom [])]
+
+    (doseq [id ids]
+      (go (>! fetch-channel (get-buses-json id dest-filters))))
+
+    (doseq [id ids]
+      (swap! result conj (<!! fetch-channel)))
+
+    (sort-by :scheduled_departure_time (flatten @result))))
