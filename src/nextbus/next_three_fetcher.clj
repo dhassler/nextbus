@@ -17,15 +17,19 @@
 
 (defn process-json [json-string headsign-filters]
   (let [parsed-json (json/read-str json-string :key-fn keyword)
-        child-stops (get-in parsed-json [:data :attributes :childStops])
-        route-patterns (flatten (map :routePatterns child-stops))
+        route-patterns (get-in parsed-json [:data :attributes :routePatterns])
         trip-stops (flatten (map :tripStops route-patterns))
         buses (map #(select-keys % [:trip_headsign :scheduled_departure_time :route_short_name]) trip-stops)
         filter-fn (partial contains? headsign-filters)
         filtered-buses (filter #(filter-fn (:trip_headsign %)) buses)
-        buses-with-date (map #(assoc % :time (format-time (:scheduled_departure_time %))) filtered-buses)
-        final-buses (sort-by :scheduled_departure_time buses-with-date)]
-    final-buses))
+        buses-with-date (map #(assoc % :time (format-time (:scheduled_departure_time %))) filtered-buses)]
+    buses-with-date))
 
 (defn get-buses-json [id dest-filters]
  (process-json (fetch-json-data id) dest-filters))
+
+(defn get-buses-json-multi [ids dest-filters]
+  (sort-by :scheduled_departure_time
+           (mapcat
+             #(process-json (fetch-json-data %) dest-filters)
+             ids)))
