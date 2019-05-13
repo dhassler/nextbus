@@ -16,9 +16,17 @@
 (defn fetch-json-data [id]
   (slurp (str rtd-json-url id)))
 
+;; handles having child stops, or not
+(defn route-patterns-from-attributes [attrs]
+  (if (< 0 (count(:routePatterns attrs)))
+    (:routePatterns attrs)
+    (flatten (map :routePatterns (:childStops attrs))) ;; recurse over child stops
+  ))
+
 (defn process-json [json-string headsign-filters]
   (let [parsed-json (json/read-str json-string :key-fn keyword)
-        route-patterns (get-in parsed-json [:data :attributes :routePatterns])
+        attributes (get-in parsed-json [:data :attributes])
+        route-patterns (route-patterns-from-attributes attributes)
         trip-stops (flatten (map :tripStops route-patterns))
         buses (map #(select-keys % [:trip_headsign :scheduled_departure_time :route_short_name]) trip-stops)
         filter-fn (partial contains? headsign-filters)

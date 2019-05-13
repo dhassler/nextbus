@@ -7,7 +7,7 @@
             [clojure.string :as s]
             (hiccup page core form)))
 
-(def origin-map { "b" {:label "Boulder",   :ids [34281,24591,33236], :filter #{"US36 & Brmfld 225D Diamond Cir 225 Laf PnR" "Lafayette PnR" "US36 & Brmfld 225E EBCC 225E Laf PnR" "Lafayette PnR via Sir Galahad" "US36 & Brmfld  225D Diamond Cir  225 Laf PnR" "US36 & Broomfield"}},
+(def origin-map { "b" {:label "Boulder",   :ids [33700], :filter #{"US36 & Brmfld 225D Diamond Cir 225 Laf PnR" "Lafayette PnR" "US36 & Brmfld 225E EBCC 225E Laf PnR" "Lafayette PnR via Sir Galahad" "US36 & Brmfld  225D Diamond Cir  225 Laf PnR" "US36 & Broomfield"}},
                   "l" {:label "Lafayette", :ids [25903,17962], :filter #{"Dtwn Boulder" "Dtwn Bldr  225D Dmd Circle" "Dtwn Bldr  225E via EBCC" "Boulder / Lafayette via Louisville", "Boulder / Lafayette via Arapahoe", "Downtown Boulder" "Dwtn Boulder"}}})
 
 (defn bus-row [h]

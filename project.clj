@@ -11,7 +11,7 @@
                  [hiccup "1.0.5"]
                  [clojure.java-time "0.3.2"]
                  [org.clojure/core.async "0.4.490"]]
-  :plugins [[lein-ring "0.12.0"]]
+  :plugins [[lein-ring "0.12.5"]]
   :ring {:handler nextbus.handler/app}
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]

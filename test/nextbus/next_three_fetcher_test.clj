@@ -10,13 +10,27 @@
   (testing "validate data"
   (let [json-string (f/fetch-json-data 34281)
         parsed-json (json/read-str json-string :key-fn keyword)
-        route-patterns (get-in parsed-json [:data :attributes :routePatterns])
+        attributes (get-in parsed-json [:data :attributes])
+        route-patterns (f/route-patterns-from-attributes attributes)
         trip-stops (flatten (map :tripStops route-patterns))
         buses (map #(select-keys % [:direction_name :trip_headsign :scheduled_departure_time :route_short_name]) trip-stops)
         westbound (filter #(= (:direction_name %) "E-Bound") buses)
         headsigns (map #(select-keys % [:route_short_name :trip_headsign]) westbound)]
-    (println headsigns)
-    (is (= 1 0))
+    (is (= (count headsigns) 30))
+    )))
+
+(deftest test-parse-with-child-stops
+  (testing "validate data"
+  (let [json-string (f/fetch-json-data 33700)
+        parsed-json (json/read-str json-string :key-fn keyword)
+        attributes (get-in parsed-json [:data :attributes])
+        route-patterns (f/route-patterns-from-attributes attributes)
+        trip-stops (flatten (map :tripStops route-patterns))
+        buses (map #(select-keys % [:direction_name :trip_headsign :scheduled_departure_time :route_short_name]) trip-stops)
+        westbound (filter #(= (:direction_name %) "E-Bound") buses)
+        headsigns (map #(select-keys % [:route_short_name :trip_headsign]) westbound)]
+    ;;(println route-patterns)
+    (is (= (count headsigns) 161))
     )))
 
 (deftest test-parse-time
