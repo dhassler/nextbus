@@ -28,10 +28,11 @@
         attributes (get-in parsed-json [:data :attributes])
         route-patterns (route-patterns-from-attributes attributes)
         trip-stops (flatten (map :tripStops route-patterns))
-        buses (map #(select-keys % [:trip_headsign :scheduled_departure_time :route_short_name]) trip-stops)
+        buses (map #(select-keys % [:trip_headsign :scheduled_departure_time :route_short_name :trip_status]) trip-stops)
         filter-fn (partial contains? headsign-filters)
         filtered-buses (filter #(filter-fn (:trip_headsign %)) buses)
-        buses-with-date (map #(assoc % :time (format-time (:scheduled_departure_time %))) filtered-buses)]
+        filtered-buses2 (filter #(not= (:trip_status %) "CANCELLED") filtered-buses)
+        buses-with-date (map #(assoc % :time (format-time (:scheduled_departure_time %))) filtered-buses2)]
     buses-with-date))
 
 (defn get-buses-json [id dest-filters]

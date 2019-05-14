@@ -38,3 +38,11 @@
     (let [unixtime 1510186144
           parsed-time (f/format-time unixtime)]
       (is (= parsed-time "05:09")))))
+
+
+(deftest test-all-parsing
+  (testing "end to end parsing"
+    (let [dest-filters #{"US36 & Brmfld 225D Diamond Cir 225 Laf PnR" "Lafayette PnR" "US36 & Brmfld 225E EBCC 225E Laf PnR" "Lafayette PnR via Sir Galahad" "US36 & Brmfld  225D Diamond Cir  225 Laf PnR" "US36 & Broomfield"}
+          output (f/process-json (f/fetch-json-data 34281) dest-filters)]
+      (is (= (count output) 17)))))
+
