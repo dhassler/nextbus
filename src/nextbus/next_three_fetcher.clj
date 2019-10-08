@@ -1,7 +1,8 @@
 (ns nextbus.next-three-fetcher
   (:require [clojure.data.json :as json]
             [clojure.core.async :refer [>! <!! chan go]]
-            [java-time :as jt]))
+            [java-time :as jt]
+            [clj-http.client :as client]))
 
 (def rtd-json-url "https://www.rtd-denver.com/api/nextride/stops/")
 
@@ -14,7 +15,7 @@
     (jt/format "hh:mm" d)))
 
 (defn fetch-json-data [id]
-  (slurp (str rtd-json-url id)))
+  (:body (client/get (str rtd-json-url id) {:accept :json})))
 
 ;; handles having child stops, or not
 (defn route-patterns-from-attributes [attrs]

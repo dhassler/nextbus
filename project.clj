@@ -10,7 +10,8 @@
                  [org.clojure/data.json "0.2.6"]
                  [hiccup "1.0.5"]
                  [clojure.java-time "0.3.2"]
-                 [org.clojure/core.async "0.4.490"]]
+                 [org.clojure/core.async "0.4.490"]
+                 [clj-http "3.10.0"]]
   :plugins [[lein-ring "0.12.5"]]
   :ring {:handler nextbus.handler/app}
   :profiles
